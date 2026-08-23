@@ -514,7 +514,7 @@ function spawnTraffic() {
 
         if (!isSpawnBlocked) {
             carsList.push(new Car(dir));
-            if (spawnRate > 15) spawnRate -= 0.5; // เพิ่มความถี่ในการเกิดรถเมื่อเวลาผ่านไป
+            if (spawnRate > 15) spawnRate -= 0.2; // เพิ่มความถี่ในการเกิดรถเมื่อเวลาผ่านไป
         }
     }
 }
@@ -603,8 +603,8 @@ function checkTrafficJam() {
         if (c.speed === 0) {
             waitingCounts[c.dir]++;
 
-            // ถ้าเลนไหนมีรถจอดต่อคิวถึง 10 คัน จะสั่งแพ้ทันที
-            if (waitingCounts[c.dir] >= 10) {
+            // ถ้าเลนไหนมีรถจอดต่อคิวถึง 5 คัน จะสั่งแพ้ทันที
+            if (waitingCounts[c.dir] >= 5) {
                 endGame("🚗⚠️ รถติดสะสมยาวเกินไป! จราจรเป็นอัมพาต");
                 return;
             }
