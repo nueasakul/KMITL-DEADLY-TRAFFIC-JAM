@@ -22,6 +22,16 @@
       <img src="rules.png" />
 
     </div>
+    <div class="right-column">
+      <div class="panel" style="margin-bottom: 20px;">
+        <h2 class="panel-title"> ควบคุมระบบ</h2>
+        <div class="button-row">
+          <button id="loadBtn" type="button" onclick="loadModel()">โหลดโมเดล</button>
+          <button id="cameraBtn" type="button" onclick="startCamera()" disabled>เปิดกล้อง</button>
+          <button id="stopBtn" type="button" onclick="stopCamera()" disabled>หยุดกล้อง</button>
+        </div>
+      </div>
+    </div>
 
     <div class="dashboard">
       <!-- คอลัมน์ซ้าย: กล้อง / พรีวิว -->
@@ -61,15 +71,6 @@
 
     <!-- คอลัมน์ขวา: แผงควบคุมและ Class Score -->
     <div class="right-column">
-      <div class="panel">
-        <h2 class="panel-title"> ควบคุมระบบ</h2>
-
-        <div class="button-row">
-          <button id="loadBtn" type="button" onclick="loadModel()">โหลดโมเดล</button>
-          <button id="cameraBtn" type="button" onclick="startCamera()" disabled>เปิดกล้อง</button>
-          <button id="stopBtn" type="button" onclick="stopCamera()" disabled>หยุดกล้อง</button>
-        </div>
-      </div>
 
       <div class="result-card">
         <div id="result">ผลลัพธ์: -</div>
