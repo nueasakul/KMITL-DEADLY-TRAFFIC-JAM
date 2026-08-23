@@ -164,18 +164,6 @@ async function loop() {
     window.requestAnimationFrame(loop);
 }
 
-function updateNextRoundUI(val) {
-    const el = document.getElementById("nextRound");
-
-    if (!el) return;
-
-    if (typeof val === "number") {
-        el.innerHTML = `สแกนท่าทางใน: ${val} วินาที`;
-    } else {
-        el.innerHTML = `สถานะ: ${val}`;
-    }
-}
-
 async function predict(inputElement) {
     const { pose, posenetOutput } = await model.estimatePose(inputElement);
     const prediction = await model.predict(posenetOutput);
@@ -199,7 +187,7 @@ async function predict(inputElement) {
     document.getElementById("confidence").innerHTML = "ความมั่นใจ: " + (highestScore * 100).toFixed(2) + "%";
 
     if (highestScore < CONFIDENCE_LIMIT) {
-        document.getElementById("result").innerHTML = "ผลลัพธ์: ไม่แน่ใจ";
+        document.getElementById("result").innerHTML = "ผลลัพธ์: Unknown Pose";
         document.getElementById("action").innerHTML = "สถานะ: ไม่พบท่าทางที่ชัดเจน";
         document.body.style.background = "linear-gradient(135deg, #ffe8e8, #ffffff)";
     } else {
