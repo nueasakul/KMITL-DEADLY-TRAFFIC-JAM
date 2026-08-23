@@ -116,7 +116,6 @@ async function startCamera() {
         if (webcam && webcam.canvas) {
             await predict(webcam.canvas);
         }
-        startScanTimer();
 
         window.requestAnimationFrame(loop);
     } catch (error) {
@@ -133,54 +132,12 @@ async function loop() {
     webcam.update();
     ctx.drawImage(webcam.canvas, 0, 0);
 
+    // 👈 ใส่คำสั่งตรวจจับท่าทางแบบ Real-time ตรงนี้
+    if (webcam && webcam.canvas) {
+        await predict(webcam.canvas);
+    }
+
     window.requestAnimationFrame(loop);
-}
-
-function stopCamera() {
-    isCameraRunning = false;
-    stopScanTimer();
-
-    if (webcam) {
-        webcam.stop();
-    }
-
-    if (model) {
-        document.getElementById("cameraBtn").disabled = false;
-    }
-
-    document.getElementById("stopBtn").disabled = true;
-}
-
-function startScanTimer() {
-    stopScanTimer();
-
-    countdownSeconds = 2;
-    updateNextRoundUI(countdownSeconds);
-
-    scanTimer = setInterval(async () => {
-        countdownSeconds--;
-
-        if (countdownSeconds > 0) {
-            updateNextRoundUI(countdownSeconds);
-        } else {
-            updateNextRoundUI("กำลังสแกน...");
-
-            if (isCameraRunning && webcam) {
-                await predict(webcam.canvas);
-            }
-
-            countdownSeconds = 2;
-            updateNextRoundUI(countdownSeconds);
-        }
-    }, 1000);
-}
-
-function stopScanTimer() {
-    if (scanTimer) {
-        clearInterval(scanTimer);
-        scanTimer = null;
-    }
-    updateNextRoundUI("-");
 }
 
 function updateNextRoundUI(val) {
