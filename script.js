@@ -166,7 +166,7 @@ async function loop() {
 
 function updateNextRoundUI(val) {
     const el = document.getElementById("nextRound");
-    
+
     if (!el) return;
 
     if (typeof val === "number") {
@@ -178,7 +178,7 @@ function updateNextRoundUI(val) {
 
 async function predict(inputElement) {
     const { pose, posenetOutput } = await model.estimatePose(inputElement);
-    const prediction = await model.predict(posenetOutput);  
+    const prediction = await model.predict(posenetOutput);
 
     let highestScore = -1;
     let highestName = "";
@@ -219,8 +219,8 @@ const gCtx = gCanvas.getContext("2d");
 let isMapLoaded = false;
 const mapImage = new Image();
 mapImage.onload = () => {
-  isMapLoaded = true; // เมื่อรูปโหลดเสร็จแล้วค่อยเปิดสถานะพร้อมวาด
-  drawMap();
+    isMapLoaded = true; // เมื่อรูปโหลดเสร็จแล้วค่อยเปิดสถานะพร้อมวาด
+    drawMap();
 }
 mapImage.src = 'map.jpg'; // เปลี่ยนเป็นชื่อ/ที่อยู่ไฟล์รูปของคุณ
 // โหลดไฟล์เสียงเตรียมไว้ (ระบุตัวพิมพ์เล็ก-ใหญ่ให้ตรงกับชื่อไฟล์ในโฟลเดอร์)
@@ -234,7 +234,7 @@ let passedCarsCount = 0;
 let isGameOver = false;
 let isGameStarted = false;
 let spawnCounter = 0;
-let spawnRate = 50;
+let spawnRate = 60;
 let animationFrameId = null;
 
 const ROAD_W = 90;
@@ -365,7 +365,7 @@ class Car {
 function startGame() {
     carsList = [];
     passedCarsCount = 0;
-    spawnRate = 50;
+    spawnRate = 60;
     spawnCounter = 0;
     trafficState = 'ALL_STOP';
     isGameOver = false;
@@ -390,6 +390,9 @@ function startGame() {
                 } else {
                     winGame(); // ผ่านเป้าหมาย = ชนะ
                 }
+            }
+            if (passedCarsCount >= 40) {
+                winGame(); // ผ่านเป้าหมาย = ชนะ
             }
         }
     }, 1000);
@@ -423,11 +426,11 @@ function winGame() {
     const startBtn = document.getElementById("startBtn");
 
     if (overlayTitle) {
-        overlayTitle.innerText = "🏆 ชนะแล้ว! คุณคุมจราจรสำเร็จ";
+        overlayTitle.innerText = "Victory!";
         overlayTitle.style.color = "#10b981";
     }
-    if (overlaySub) overlaySub.innerText = "ปล่อยรถผ่านไปได้อย่างปลอดภัย: " + passedCarsCount + " คัน";
-    if (overlayBtn) overlayBtn.innerText = "🔄 เล่นใหม่อีกครั้ง";
+    if (overlaySub) overlaySub.innerText = "คุณผ่านสี่แยกมรณะโดยสวัสดิภาพ";
+    if (overlayBtn) overlayBtn.innerText = "เล่นใหม่อีกครั้ง";
     if (gameOverlay) {
         gameOverlay.classList.remove("hidden");
         gameOverlay.style.display = "flex";
@@ -540,7 +543,7 @@ function checkAccidents() {
     }
 }
 
-function endGame(reason = "💥 รถชนกันวินาศฝีกา!") {
+function endGame(reason = "Defeated!") {
     lossSound.currentTime = 0; // รีเซ็ตเวลาเสียงเริ่มใหม่
     lossSound.play().catch(e => console.log("Audio play error:", e));
 
