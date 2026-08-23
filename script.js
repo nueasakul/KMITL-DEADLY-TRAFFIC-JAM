@@ -16,15 +16,6 @@ let countdownSeconds = 2;
 // ป้องกัน Error กรณีไม่มี element id="screen-size" ใน HTML
 const display = document.getElementById('screen-size');
 
-function updateSize() {
-    if (!display) return;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    display.innerText = `${width} x ${height} px`;
-}
-updateSize();
-window.addEventListener('resize', updateSize);
-
 async function loadModel() {
     const loadBtn = document.getElementById("loadBtn");
     const actionText = document.getElementById("action");
