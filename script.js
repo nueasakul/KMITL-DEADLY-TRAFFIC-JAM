@@ -126,6 +126,30 @@ async function startCamera() {
     }
 }
 
+async function stopCamera() {
+    isCameraRunning = false; // สั่งหยุด Loop สแกนภาพ
+
+    // หยุดการทำงานของกล้อง
+    if (webcam) {
+        webcam.stop();
+    }
+
+    // ล้างหน้าจอ Canvas พรีวิวกดเปิด/ปิดกล้อง
+    const webcamCanvas = document.getElementById("webcamCanvas");
+    if (webcamCanvas && ctx) {
+        ctx.clearRect(0, 0, webcamCanvas.width, webcamCanvas.height);
+    }
+
+    // อัปเดตสถานะปุ่มและข้อความ
+    const cameraBtn = document.getElementById("cameraBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const actionText = document.getElementById("action");
+
+    if (cameraBtn) cameraBtn.disabled = false; // เปิดให้กดเปิดกล้องได้อีกครั้ง
+    if (stopBtn) stopBtn.disabled = true;     // ปิดปุ่มหยุดกล้อง
+    if (actionText) actionText.innerHTML = "สถานะ: ปิดกล้องแล้ว";
+}
+
 async function loop() {
     if (!isCameraRunning) return;
 
@@ -192,9 +216,19 @@ async function predict(inputElement) {
 // ==========================================
 const gCanvas = document.getElementById("gameCanvas");
 const gCtx = gCanvas.getContext("2d");
+let isMapLoaded = false;
+const mapImage = new Image();
+mapImage.onload = () => {
+  isMapLoaded = true; // เมื่อรูปโหลดเสร็จแล้วค่อยเปิดสถานะพร้อมวาด
+  drawMap();
+}
+mapImage.src = 'map.jpg'; // เปลี่ยนเป็นชื่อ/ที่อยู่ไฟล์รูปของคุณ
+// โหลดไฟล์เสียงเตรียมไว้ (ระบุตัวพิมพ์เล็ก-ใหญ่ให้ตรงกับชื่อไฟล์ในโฟลเดอร์)
+const winSound = new Audio('WinSound.m4a');
+const lossSound = new Audio('lossSound.m4a');
 
 let trafficState = 'ALL_STOP';
-let gameTimer = 90; // 90 วินาที (1 นาทีครึ่ง)
+let gameTimer = 60; // 60 วินาที (1 นาที)
 let timerInterval = null
 let passedCarsCount = 0;
 let isGameOver = false;
@@ -203,7 +237,7 @@ let spawnCounter = 0;
 let spawnRate = 50;
 let animationFrameId = null;
 
-const ROAD_W = 120;
+const ROAD_W = 90;
 const CENTER_X = gCanvas.width / 2;
 const CENTER_Y = gCanvas.height / 2;
 
@@ -214,6 +248,14 @@ const STOP_EAST = CENTER_X + ROAD_W / 2 + 10;
 
 let carsList = [];
 
+function drawMap() {
+    if (isMapLoaded) {
+        gCtx.drawImage(mapImage, 0, 0, gCanvas.width, gCanvas.height);
+    } else {
+        gCtx.fillStyle = '#10b981';
+        gCtx.fillRect(0, 0, gCanvas.width, gCanvas.height);
+    }
+}
 class Car {
     constructor(dir) {
         this.dir = dir;
@@ -229,18 +271,18 @@ class Car {
         this.isAngry = false;
 
         if (dir === 'N') {
-            this.x = CENTER_X - ROAD_W / 4 - this.width / 2;
+            this.x = CENTER_X - ROAD_W / 4 - this.width / 2 + 40;
             this.y = -50;
         } else if (dir === 'S') {
-            this.x = CENTER_X + ROAD_W / 4 - this.width / 2;
+            this.x = CENTER_X + ROAD_W / 4 - this.width / 2 - 38;
             this.y = gCanvas.height + 50;
         } else if (dir === 'W') {
             this.x = -50;
-            this.y = CENTER_Y + ROAD_W / 4 - this.height / 2;
+            this.y = CENTER_Y + ROAD_W / 4 - this.height / 2 - 30;
             this.width = 42; this.height = 24;
         } else if (dir === 'E') {
             this.x = gCanvas.width + 50;
-            this.y = CENTER_Y - ROAD_W / 4 - this.height / 2;
+            this.y = CENTER_Y - ROAD_W / 4 - this.height / 2 + 48;
             this.width = 42; this.height = 24;
         }
     }
@@ -329,8 +371,8 @@ function startGame() {
     isGameOver = false;
     isGameStarted = true;
 
-    // รีเซ็ตตัวนับเวลา 90 วินาที
-    gameTimer = 90;
+    // รีเซ็ตตัวนับเวลา 60 วินาที
+    gameTimer = 60;
     if (timerInterval) clearInterval(timerInterval);
 
     // สั่งนับถอยหลังทุกๆ 1 วินาที
@@ -340,7 +382,14 @@ function startGame() {
             updateGameHUD();
 
             if (gameTimer <= 0) {
-                winGame(); // เวลาหมด = ชนะทันที
+                if (timerInterval) clearInterval(timerInterval);
+
+                // เช็กเงื่อนไข: ถ้ารถผ่านน้อยกว่า 40 คัน
+                if (passedCarsCount < 40) {
+                    endGame("⚠️ เวลาหมดแล้ว! แต่ปล่อยรถไม่ทันเป้าหมาย (ต้องได้ 40 คันขึ้นไป)");
+                } else {
+                    winGame(); // ผ่านเป้าหมาย = ชนะ
+                }
             }
         }
     }, 1000);
@@ -360,6 +409,9 @@ function startGame() {
 }
 
 function winGame() {
+    winSound.currentTime = 0; // รีเซ็ตเวลาเสียงเริ่มใหม่
+    winSound.play().catch(e => console.log("Audio play error:", e));
+
     isGameOver = true;
     isGameStarted = false;
     if (timerInterval) clearInterval(timerInterval);
@@ -415,7 +467,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 function updateGameHUD() {
-    // คำนวณแปลง 90 วินาที -> 01:30
+    // คำนวณแปลง 60 วินาที -> 01:00
     const minutes = Math.floor(gameTimer / 60);
     const seconds = gameTimer % 60;
     const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -437,21 +489,6 @@ function updateGameHUD() {
     } else if (trafficState === 'SOUTH_GO') {
         signalText.innerText = "⬇️ ล่างไป"; signalText.style.color = "#10b981";
     }
-}
-
-function drawMap() {
-    gCtx.fillStyle = '#10b981';
-    gCtx.fillRect(0, 0, gCanvas.width, gCanvas.height);
-
-    gCtx.fillStyle = '#334155';
-    gCtx.fillRect(CENTER_X - ROAD_W / 2, 0, ROAD_W, gCanvas.height);
-    gCtx.fillRect(0, CENTER_Y - ROAD_W / 2, gCanvas.width, ROAD_W);
-
-    gCtx.fillStyle = '#ef4444';
-    gCtx.fillRect(CENTER_X - ROAD_W / 2, STOP_NORTH, ROAD_W / 2, 4);
-    gCtx.fillRect(CENTER_X, STOP_SOUTH, ROAD_W / 2, 4);
-    gCtx.fillRect(STOP_WEST, CENTER_Y, 4, ROAD_W / 2);
-    gCtx.fillRect(STOP_EAST, CENTER_Y - ROAD_W / 2, 4, ROAD_W / 2);
 }
 
 function spawnTraffic() {
@@ -504,6 +541,9 @@ function checkAccidents() {
 }
 
 function endGame(reason = "💥 รถชนกันวินาศฝีกา!") {
+    lossSound.currentTime = 0; // รีเซ็ตเวลาเสียงเริ่มใหม่
+    lossSound.play().catch(e => console.log("Audio play error:", e));
+
     isGameOver = true;
     isGameStarted = false;
     if (timerInterval) clearInterval(timerInterval);
@@ -560,8 +600,8 @@ function checkTrafficJam() {
         if (c.speed === 0) {
             waitingCounts[c.dir]++;
 
-            // ถ้าเลนไหนมีรถจอดต่อคิวถึง 5 คัน จะสั่งแพ้ทันที
-            if (waitingCounts[c.dir] >= 5) {
+            // ถ้าเลนไหนมีรถจอดต่อคิวถึง 10 คัน จะสั่งแพ้ทันที
+            if (waitingCounts[c.dir] >= 10) {
                 endGame("🚗⚠️ รถติดสะสมยาวเกินไป! จราจรเป็นอัมพาต");
                 return;
             }

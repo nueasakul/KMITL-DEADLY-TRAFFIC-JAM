@@ -3,7 +3,12 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Crazy Traffic Cop - Teachable Machine Classifier</title>
+  <title>เกมพิชิตสี่แยกมรณะ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
   <!-- TensorFlow.js & Teachable Machine Libraries -->
@@ -15,12 +20,7 @@
   <div id="screen-size">กำลังโหลด...</div>
   <div class="app">
     <div class="header">
-      <h1>เกมจราจรหัวจะปวด (Crazy Traffic Cop)</h1>
-      <p>พิชิตสี่แยกวัดใจ KMITL</p>
-    </div>
-
-    <div class="header">
-      <h3>วิธิการเล่น เกมจราจรหัวจะปวด (Crazy Traffic Cop)</h3>
+      <img src="rules.png" />
 
     </div>
 
@@ -33,11 +33,6 @@
           <canvas id="webcamCanvas" width="400" height="400"></canvas>
           <img id="previewImage" alt="preview" />
         </div>
-
-        <div class="hint">
-          สแกนท่าทางอัตโนมัติ หรือใช้คีย์บอร์ดทดสอบ:<br>
-          <kbd>1</kbd> หยุดทั้งหมด | <kbd>A</kbd> ซ้ายไป | <kbd>D</kbd> ขวาไป | <kbd>W</kbd> บนไป | <kbd>S</kbd> ล่างไป
-        </div>
       </div>
 
       <!-- คอลัมน์กลาง: ตัวเกมหลัก Canvas -->
@@ -47,15 +42,18 @@
           <div>รถผ่าน: <span id="passedCars">0</span></div>
           <div>สัญญาณ: <span id="currentSignal" style="color: #ef4444;">ALL STOP</span></div>
           <button id="startBtn" onclick="startGame()"
-            style="background: #10b981; color: white; border: none; padding: 4px 12px;">▶️ เริ่มเกม</button>
+            style="background: transparent; border: none; outline: none; box-shadow: none; padding: 0; cursor: pointer;">
+            <img src="start_0.png" alt="เริ่มเกม"
+              style="height: 60px; display: block; border: none; background: transparent;" />
+          </button>
         </div>
 
-        <canvas id="gameCanvas" width="550" height="550"></canvas>
+        <canvas id="gameCanvas" width="650" height="650"></canvas>
 
-        <div id="gameOverOverlay" class="overlay hidden">
+        <div id="gameOverlay" class="overlay hidden">
           <div class="overlay-content">
-            <h2>💥 รถชนกันวินาศฝีกา!</h2>
-            <p>คะแนนที่คุณทำได้: <span id="finalScore">0</span></p>
+            <h2 id="overlayTitle">💥 รถชนกันวินาศฝีกา!</h2>
+            <p id="overlaySub">รถผ่านไปได้เพียง: 0 คัน</p>
             <button onclick="restartGame()">🔄 เล่นใหม่อีกครั้ง</button>
           </div>
         </div>
